@@ -13,14 +13,46 @@
         }
 
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             background-color: #000;
             color: white;
             overflow: hidden;
-            position: relative;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* صفحه اصلی خالی */
+        .main-page {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main-title {
+            font-size: 32px;
+            color: #444;
+            text-align: center;
+        }
+
+        /* پنجره تمام‌صفحه برای محتوا */
+        .fullscreen-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .background-gif {
@@ -96,7 +128,7 @@
 
         .click-text {
             color: #a0a0c0;
-            font-size: 16px;
+            font-size: 20px;
             margin-bottom: 10px;
             font-style: italic;
         }
@@ -201,44 +233,71 @@
             70% { box-shadow: 0 0 0 15px rgba(106, 17, 203, 0); }
             100% { box-shadow: 0 0 0 0 rgba(106, 17, 203, 0); }
         }
+
+        /* جلوگیری از انتخاب متن و زوم */
+        body {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+        }
     </style>
 </head>
 <body>
-    <img src="https://uploadkon.ir/uploads/c45b23_25InShot-20251123-150816028.gif" class="background-gif" id="backgroundGif" alt="پس‌زمینه متحرک">
+    <!-- صفحه اصلی خالی -->
+    <div class="main-page">
+        <h1 class="main-title">صفحه اصلی</h1>
+    </div>
     
-    <div class="container">
-        <div class="play-button pulse" id="playButton">
-            <i class="fas fa-play play-icon"></i>
-        </div>
+    <!-- پنجره تمام‌صفحه برای محتوا -->
+    <div class="fullscreen-window">
+        <img src="https://uploadkon.ir/uploads/c45b23_25InShot-20251123-150816028.gif" class="background-gif" id="backgroundGif" alt="پس‌زمینه متحرک">
         
-        <div class="click-text">کلیک کن بچه :)</div>
-        
-        <div class="audio-player hidden" id="audioPlayer">
-            <div class="track-info">
-                <div class="track-title">موسیقی انتخابی</div>
-                <div class="auto-play-info">
-                    <i class="fas fa-redo"></i>
-                    پخش خودکار فعال
-                </div>
+        <div class="container">
+            <div class="play-button pulse" id="playButton">
+                <i class="fas fa-play play-icon"></i>
             </div>
             
-            <div class="progress-area">
-                <div class="progress-bar" id="progressBar">
-                    <div class="progress" id="progress"></div>
-                </div>
-                <div class="time">
-                    <span id="currentTime">0:00</span>
-                    <span id="duration">0:00</span>
-                </div>
-            </div>
+            <div class="click-text">کلیک کن :)</div>
             
-            <a href="https://t.me/u0v0n" class="creator-link" target="_blank" onclick="sendTelegramMessage()">
-                <i class="fab fa-telegram"></i> سازنده
-            </a>
-        </div>
+            <div class="audio-player hidden" id="audioPlayer">
+                <div class="track-info">
+                    <div class="track-title">مغز های زنگ زده</div>
+                    <div class="auto-play-info">
+                        <i class="fas fa-redo"></i>
+                        پخش خودکار فعال
+                    </div>
+                </div>
+                
+                <div class="progress-area">
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <div class="time">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                </div>
+                
+                <a href="https://t.me/u0v0n" class="creator-link" target="_blank" onclick="sendTelegramMessage()">
+                    <i class="fab fa-telegram"></i> سازنده
+                </a>
+            </div>
 
-        <div class="loading hidden" id="loadingMessage">
-            در حال بارگذاری موسیقی...
+            <div class="loading hidden" id="loadingMessage">
+                در حال بارگذاری موسیقی...
+            </div>
         </div>
     </div>
 
@@ -258,6 +317,26 @@
         const duration = document.getElementById('duration');
         const loadingMessage = document.getElementById('loadingMessage');
 
+        // جلوگیری از کلیک راست و انتخاب متن
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // جلوگیری از زوم با اسکرول
+        document.addEventListener('wheel', function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // جلوگیری از زوم با صفحه کلید
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0')) {
+                e.preventDefault();
+            }
+        });
+
         // فعال کردن قابلیت پخش خودکار (لوپ)
         audioElement.loop = true;
 
@@ -270,7 +349,7 @@
 
         // پخش موسیقی با کلیک روی دکمه پلی
         playButton.addEventListener('click', function() {
-            // نمایش گیف
+            // نمایش گیف پس‌زمینه
             backgroundGif.classList.add('show');
             
             // نمایش پیام در حال بارگذاری
